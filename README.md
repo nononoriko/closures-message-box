@@ -14,7 +14,7 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
 4. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Key. (Do not share this to anyone unless you know what you're doing)
 5. A [Telegram Bot](https://t.me/BotFather) token. (Ditto)
 6. The handle(username) of your desired ~~Twitter~~ X account.
-7. The ID of the chat you want the bot to send updates.
+7. The ID of the chat you want the bot to send updates to.
 
 ## Running
 1. Clone this repository:
