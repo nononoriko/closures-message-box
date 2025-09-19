@@ -3,18 +3,22 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
 
 ## Prerequisites
 1. [Python](https://www.python.org/downloads/) (Preferably the newest version)
-2. [python-telegram-bot](https://pypi.org/project/python-telegram-bot/) (Preferably the newest version)
-   ```bat
+2. [python-telegram-bot](https://pypi.org/project/python-telegram-bot/) (Preferably the newest version, install after Python)
+   ```bash
    pip install python-telegram-bot
    ```
-3. [tweepy](https://pypi.org/project/tweepy/) (Preferably the newest version)
-   ```bat
+3. [tweepy](https://pypi.org/project/tweepy/) (Preferably the newest version, install after Python)
+   ```bash
    pip install tweepy
    ```
+4. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Key.
+5. A [Telegram Bot](https://t.me/BotFather) token.
+6. The handle(username) of your desired ~~Twitter~~ X account.
+7. The ID of the chat you want the bot to send updates.
 
 ## Running
 1. Clone this repository:
-   ```bat
+   ```bash
    git clone https://github.com/uwungu01-rep/closures-message-box
    ```
    Alternatively, download the [zip](https://github.com/uwungu01-rep/closures-message-box/archive/refs/heads/main.zip) file and unzip it at your desired location.
@@ -29,6 +33,9 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
    ```
 3. Run ```run.bat```
 4. And you're done.
+
+## Note(s)
+1. This script was design to work with ~~Twitter~~ X's free API. Higher tiers require additional adjustments if you want the bot to send videos.
 
 ## License
 This program is licensed under the GNU General Public License 3.0, see [LICENSE](LICENSE) for more details.
