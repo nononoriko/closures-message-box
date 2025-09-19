@@ -24,9 +24,6 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
     Clone this repository:
     Alternatively, download the <a href="https://github.com/uwungu01-rep/closures-message-box/archive/refs/heads/main.zip">zip</a> file.
   </li>
-  <li>
-    
-  </li>
 </ol>
 
 ## License
