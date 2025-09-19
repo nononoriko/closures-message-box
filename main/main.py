@@ -42,13 +42,33 @@ def extract_tweet_data(tweets, timezone):
     media_lookup = {}
 
     if "media" in tweets.includes:
-        for media in tweets.includes["media"]:
-            media_lookup[media.media_key] = media
-    
+        for m in tweets.includes["media"]:
+            media_lookup[m.media_key] = m
+
     for tweet in tweets.data:
         text = tweet.text
-        urls = []
+        urls_to_replace = []
 
+        if hasattr(tweet, "entities") and tweet.entities:
+            if "urls" in tweet.entities:
+                for url_entity in tweet.entities["urls"]:
+                    tco = url_entity["url"]
+                    expanded = url_entity["expanded_url"]
+                    
+                    if not any(m.url in tco for m in media_lookup.values()):
+                        urls_to_replace.append((tco, expanded))
+        
+        for tco, expanded in urls_to_replace:
+            text = text.replace(tco, expanded)
+
+        if hasattr(tweet, "entities") and tweet.entities:
+            if "mentions" in tweet.entities:
+                for mention in tweet.entities["mentions"]:
+                    username = mention["username"]
+                    text = text.replace(f"@{username}", f"https://x.com/{username}")
+
+        urls = []
+        has_video = False
         if hasattr(tweet, "attachments") and "media_keys" in tweet.attachments:
             for key in tweet.attachments["media_keys"]:
                 if key in media_lookup:
@@ -64,9 +84,9 @@ def extract_tweet_data(tweets, timezone):
 
         results.append(
             {
-                "text": text, 
-                "media": urls, 
                 "id": tweet.id,
+                "text": text,
+                "media": urls,
                 "has_video": has_video,
                 "created_at": time_str
             }
@@ -104,13 +124,14 @@ async def main(timezone):
         else:
             await TBot.send_message(dataDict["ChatID"], caption)
 
-if __name__ == "__main__":
+async def job():
     localTimeZone = datetime.now().astimezone().tzinfo
     scheduler = AsyncIOScheduler(timezone=localTimeZone)
     scheduler.add_job(main, "cron", hour=9, minute=0, args=[localTimeZone])
     scheduler.start()
 
-    try:
-        asyncio.get_event_loop().run_forever()
-    except (KeyboardInterrupt, SystemExit):
-        pass
+    await asyncio.Event().wait()   
+
+if __name__ == "__main__":
+    localTimeZone = datetime.now().astimezone().tzinfo
+    asyncio.run(main(localTimeZone))
