@@ -3,18 +3,22 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
 
 ## Prerequisites
 1. [Python](https://www.python.org/downloads/) (Preferably the newest version)
-2. [python-telegram-bot](https://pypi.org/project/python-telegram-bot/) (Preferably the newest version, install after Python)
+2. [python-telegram-bot](https://pypi.org/project/python-telegram-bot/) (Ditto, install after Python)
    ```bash
    pip install python-telegram-bot
    ```
-3. [tweepy](https://pypi.org/project/tweepy/) (Preferably the newest version, install after Python)
+3. [tweepy](https://pypi.org/project/tweepy/) (Ditto)
    ```bash
    pip install tweepy
    ```
-4. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Key. (Do not share this to anyone unless you know what you're doing)
-5. A [Telegram Bot](https://t.me/BotFather) token. (Ditto)
-6. The handle(username) of your desired ~~Twitter~~ X account.
-7. The ID of the chat you want the bot to send updates to.
+4. [apscheduler](https://pypi.org/project/APScheduler/) (Ditto)
+   ```bash
+   pip install apscheduler
+   ```
+5. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Key. (Do not share this to anyone unless you know what you're doing)
+6. A [Telegram Bot](https://t.me/BotFather) token. (Ditto)
+7. The handle(username) of your desired ~~Twitter~~ X account.
+8. The ID of the chat you want the bot to send updates to.
 
 ## Running
 1. Clone this repository:
