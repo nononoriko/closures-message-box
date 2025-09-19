@@ -15,8 +15,6 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
   </li>
   <li>
     <a href="https://pypi.org/project/tweepy/">tweepy</a> (Preferably the newest version)
-
-    pip install tweepy
   </li>
 </ol>
 
@@ -24,11 +22,7 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
 <ol>
   <li>
     Clone this repository:
-
-    ```powershell
-    git clone https://github.com/uwungu01-rep/closures-message-box.git
-    ```
-  Alternatively, download the <a href="https://github.com/uwungu01-rep/closures-message-box/archive/refs/heads/main.zip">zip</a> file.
+    Alternatively, download the <a href="https://github.com/uwungu01-rep/closures-message-box/archive/refs/heads/main.zip">zip</a> file.
   </li>
   <li>
     
