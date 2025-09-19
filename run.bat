@@ -1,1 +1,0 @@
-python -u ./main/main.py
