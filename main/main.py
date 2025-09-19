@@ -1,6 +1,6 @@
 from telegram import Bot, InputMediaPhoto
 from datetime import datetime, timezone, timedelta
-import json, tweepy, asyncio
+import json, tweepy, asyncio, pytz
 
 with open("./main/data.json") as file:
     dataDict = json.load(file)
@@ -30,7 +30,7 @@ def to_rfc3339(dt: datetime):
 
     return dt.strftime(f"%Y-%m-%dT%H:%M:%S.{ms:03d}Z")
 
-def extract_tweet_data(tweets):
+def extract_tweet_data(tweets, timezone):
     results = []
     media_lookup = {}
 
@@ -51,13 +51,17 @@ def extract_tweet_data(tweets):
                     elif media.type in ["video", "animated_gif"]:
                         urls.append(media.preview_image_url)
                         has_video = True
+
+        local_time = tweet.created_at.astimezone(timezone)
+        time_str = local_time.strftime("%Y-%m-%d %H:%M:%S %Z")
+
         results.append(
             {
                 "text": text, 
                 "media": urls, 
                 "id": tweet.id,
                 "has_video": has_video,
-                "created_at": tweet.created_at.strftime("%Y-%m-%d %H:%M:%S UTC")
+                "created_at": time_str
             }
         )
 
@@ -69,9 +73,11 @@ async def main():
         bearer_token=dataDict["XToken"],
         wait_on_rate_limit=True
     )
+    localTimeZone = datetime.now().astimezone().tzinfo
 
     tweets = get_recent_tweets(client)
-    extracted = extract_tweet_data(tweets)
+    extracted = extract_tweet_data(tweets, localTimeZone)
+
 
     for tweet in extracted:
         caption = f"""{tweet["text"]}
