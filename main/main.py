@@ -3,8 +3,13 @@ from datetime import datetime, timezone, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import json, tweepy, asyncio
 
+requiredKeys = ["XToken", "BotToken", "AccountHandle", "ChatID"]
+
 with open("./main/data.json") as file:
     dataDict = json.load(file)
+    if [key for key in requiredKeys if key not in dataDict.keys()]:
+        print("Incorrect data.json, cannot continue, exit.")
+        exit(-1)
 
 def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
     now = datetime.now(timezone.utc)
@@ -74,7 +79,6 @@ async def main(timezone):
         bearer_token=dataDict["XToken"],
         wait_on_rate_limit=True
     )
-    
 
     tweets = get_recent_tweets(client)
     extracted = extract_tweet_data(tweets, timezone)
