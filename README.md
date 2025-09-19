@@ -35,7 +35,7 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
       "ChatID": "THE_ID_OF_THE_CHAT_YOU_WANT_THE_BOT_TO_SEND_UPDATES"
    }
    ```
-3. Run ```run.bat```.
+3. Run ```closures-message-box.bat```.
 4. And you're done.
 
 ## Note(s)
