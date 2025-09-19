@@ -1,6 +1,7 @@
 from telegram import Bot, InputMediaPhoto
 from datetime import datetime, timezone, timedelta
-import json, tweepy, asyncio, pytz
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+import json, tweepy, asyncio
 
 with open("./main/data.json") as file:
     dataDict = json.load(file)
@@ -67,16 +68,16 @@ def extract_tweet_data(tweets, timezone):
 
     return results
 
-async def main():
+async def main(timezone):
     TBot = Bot(dataDict["BotToken"])
     client = tweepy.Client(
         bearer_token=dataDict["XToken"],
         wait_on_rate_limit=True
     )
-    localTimeZone = datetime.now().astimezone().tzinfo
+    
 
     tweets = get_recent_tweets(client)
-    extracted = extract_tweet_data(tweets, localTimeZone)
+    extracted = extract_tweet_data(tweets, timezone)
 
 
     for tweet in extracted:
@@ -99,4 +100,12 @@ async def main():
             await TBot.send_message(dataDict["ChatID"], caption)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    localTimeZone = datetime.now().astimezone().tzinfo
+    scheduler = AsyncIOScheduler(timezone=localTimeZone)
+    scheduler.add_job(main, "cron", hour=9, minute=0, args=[localTimeZone])
+    scheduler.start()
+
+    try:
+        asyncio.get_event_loop().run_forever()
+    except (KeyboardInterrupt, SystemExit):
+        pass
