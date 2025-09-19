@@ -36,6 +36,7 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
 
 ## Note(s)
 1. This script was design to work with ~~Twitter~~ X's free API. Higher tiers require additional adjustments if you want the bot to send videos.
+2. Running this with a smaller interval is theoretically possible, but be prepare to be rate-limit by Elon Musk unless you're using higher tiers.
 
 ## License
 This program is licensed under the GNU General Public License 3.0, see [LICENSE](LICENSE) for more details.
