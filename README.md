@@ -12,6 +12,7 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
     ```powershell
     pip install python-telegram-bot
     ```
+    
   </li>
   <li>
     <a href="https://pypi.org/project/tweepy/">tweepy</a> (Preferably the newest version)
