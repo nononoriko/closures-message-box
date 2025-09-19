@@ -77,7 +77,8 @@ async def main():
         caption = f"""{tweet["text"]}
 
 [Timestamp] {tweet["created_at"]}
-https://x.com/{dataDict["AccountHandle"]}/status/{tweet["id"]}{"\n[Video]" if tweet["has_video"] else ""}""".strip()
+[Link] https://x.com/{dataDict["AccountHandle"]}/status/{tweet["id"]}
+[Video] {"Yes" if tweet["has_video"] else "No"}"""
         if tweet["media"]:
             mediaGroup = []
 
