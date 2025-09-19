@@ -7,8 +7,9 @@ requiredKeys = ["XToken", "BotToken", "AccountHandle", "ChatID"]
 
 with open("./main/data.json") as file:
     dataDict = json.load(file)
-    if [key for key in requiredKeys if key not in dataDict.keys()]:
-        print("Incorrect data.json, cannot continue, exit.")
+    missingKeys = [key for key in requiredKeys if key not in dataDict]
+    if missingKeys:
+        print(f"Missing {", ".join(missingKeys)}, cannot continue, exiting.")
         exit(-1)
 
 def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
