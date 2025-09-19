@@ -13,12 +13,12 @@ A Telegram bot that perodically updates you with ~~Tweets~~ Xs, from your favori
    ```
 
 ## Running
-<ol>
-  <li>
-    Clone this repository:
-    Alternatively, download the <a href="https://github.com/uwungu01-rep/closures-message-box/archive/refs/heads/main.zip">zip</a> file.
-  </li>
-</ol>
+1. Clone this repository:
+   ```
+   git clone https://github.com/uwungu01-rep/closures-message-box
+   ```
+   Alternatively, download the [zip](https://github.com/uwungu01-rep/closures-message-box/archive/refs/heads/main.zip) file and unzip it at your desired location.
+2. 
 
 ## License
 This program is licensed under the GNU General Public License 3.0, see [LICENSE](LICENSE) for more details.
