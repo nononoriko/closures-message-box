@@ -161,7 +161,7 @@ def extract_tweet_data(tweets, timezone) -> list[dict]:
 
     return results
 
-def clamp(number: int | float, min: int | float, max: int | float = None) -> int | float:
+def clamp(number, min, max = None):
     if max is None:
         max, min = min, 0
 
