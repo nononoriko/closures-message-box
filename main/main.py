@@ -9,7 +9,8 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    "maxResult",
+    "--maxResult",
+    "-r",
     type=int,
     nargs="?",
     default=0,
