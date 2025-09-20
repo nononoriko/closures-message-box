@@ -1,5 +1,5 @@
 # Closure's Message Box
-A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favorite ~~Twitter~~ X account in the last 24 hours.
+A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favorite ~~Twitter~~ X account from the last 24 hours.
 
 ## Prerequisites
 1. [Python](https://www.python.org/downloads/) (Preferably the newest version)
