@@ -2,7 +2,44 @@ from telegram import Bot, InputMediaPhoto
 from datetime import datetime, timezone, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from urllib.parse import urlparse
-import json, tweepy, asyncio
+import json, tweepy, asyncio, argparse
+
+parser = argparse.ArgumentParser(
+    description="Command line arguments for Closure's Message Box."
+)
+
+parser.add_argument(
+    "maxResult",
+    type=int,
+    nargs="?",
+    default=0,
+    help="Limit the amount of posts to pull. No limit by default."
+)
+
+parser.add_argument(
+    "hour",
+    type=int,
+    nargs="?",
+    default=9,
+    help="Hour of the day (0–23) when the script should run. Default: 9. Will be ignore if --inf isn't provided."
+)
+
+parser.add_argument(
+    "minute",
+    type=int,
+    nargs="?",
+    default=0,
+    help="Minute of the hour (0–59) when the script should run. Default: 0. Will be ignore if --inf isn't provided."
+)
+
+parser.add_argument(
+    "--inf",
+    action="store_true",
+    default=False,
+    help="Whether to run the script indefinitely until interrupt by the user. Run once by default."
+)
+
+cl_args = parser.parse_args()
 
 requiredKeys = ["XToken", "BotToken", "AccountHandle", "ChatID"]
 
@@ -10,7 +47,7 @@ with open("./main/data.json") as file:
     dataDict = json.load(file)
     missingKeys = [key for key in requiredKeys if key not in dataDict]
     if missingKeys:
-        print(f"Missing {", ".join(missingKeys)}, cannot continue, exiting.")
+        print(f"Missing {", ".join(missingKeys)} from data.json, cannot continue, exiting.")
         exit(-1)
 
 def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
@@ -20,32 +57,36 @@ def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
     user = client.get_user(username=dataDict["AccountHandle"])
     userID = user.data.id
 
-    tweets = client.get_users_tweets(
-        id=userID,
-        start_time = to_rfc3339(startTime),
-        end_time = to_rfc3339(now),
-        max_results = 5,
-        tweet_fields = ["created_at", "entities"],
-        expansions = ["attachments.media_keys"],
-        media_fields=["url", "preview_image_url", "type"]
-    )
+    kwargs = {
+        "id": userID,
+        "start_time": to_rfc3339(startTime),
+        "end_time": to_rfc3339(now),
+        "tweet_fields": ["created_at", "entities"],
+        "expansions": ["attachments.media_keys"],
+        "media_fields": ["url", "preview_image_url", "type"]
+    }
+
+    if cl_args.maxResult > 0:
+        kwargs["max_results"] = cl_args.maxResult
+
+    tweets = client.get_users_tweets(**kwargs)
 
     return tweets
 
-def to_rfc3339(dt: datetime):
+def to_rfc3339(dt: datetime) -> str:
     dt.astimezone(timezone.utc)
     ms = int(dt.microsecond / 1000)
 
     return dt.strftime(f"%Y-%m-%dT%H:%M:%S.{ms:03d}Z")
 
-def is_url(url: str):
+def is_url(url: str) -> bool:
     try:
         urlparse(url)
         return True
     except:
         return False
 
-def extract_tweet_data(tweets, timezone):
+def extract_tweet_data(tweets, timezone) -> list[dict]:
     results = []
     media_lookup = {}
 
@@ -120,7 +161,13 @@ def extract_tweet_data(tweets, timezone):
 
     return results
 
-async def main(timezone):
+def clamp(number: int | float, min: int | float, max: int | float = None) -> int | float:
+    if max is None:
+        max, min = min, 0
+
+    return max if number > max else min if number < min else number
+
+async def main(timezone) -> None:
     TBot = Bot(dataDict["BotToken"])
     client = tweepy.Client(
         bearer_token=dataDict["XToken"],
@@ -149,13 +196,32 @@ async def main(timezone):
         else:
             await TBot.send_message(dataDict["ChatID"], caption)
 
-async def job():
-    localTimeZone = datetime.now().astimezone().tzinfo
-    scheduler = AsyncIOScheduler(timezone=localTimeZone)
-    scheduler.add_job(main, "cron", hour=9, minute=0, args=[localTimeZone])
+async def run(timezone):
+    main(timezone)
+
+async def run_scheduler(timezone):
+    scheduler = AsyncIOScheduler(timezone=timezone)
+    run_hour = clamp(cl_args.hour, 23)
+    run_minute = clamp(cl_args.minute, 59)
+
+    scheduler.add_job(
+        run,
+        "cron",
+        hour=run_hour,
+        minute=run_minute,
+        args=[timezone]
+    )
     scheduler.start()
 
-    await asyncio.Event().wait()   
+    try:
+        asyncio.Event().wait()
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()
 
 if __name__ == "__main__":
-    asyncio.run(job())
+    localTimeZone = datetime.now().astimezone().tzinfo
+
+    if cl_args.inf:
+        asyncio.run(run_scheduler(localTimeZone))
+    else:
+        asyncio.run(run(localTimeZone))

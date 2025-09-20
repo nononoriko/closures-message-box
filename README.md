@@ -35,8 +35,14 @@ A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favor
       "ChatID": "THE_ID_OF_THE_CHAT_YOU_WANT_THE_BOT_TO_SEND_UPDATES"
    }
    ```
-3. Run ```closures-message-box.bat``` in the ```run``` folder.
+3. Run ```closures-message-box.bat``` in the ```run``` folder. Optionally with [arguments](#command-line-arguments).
 4. And you're done.
+
+## Command line arguments
+1. maxResult: Limit the amount of post the script will pull. No limit by default.
+2. hour: Hour of the day (0–23) when the script should run. Default: 9. Will be ignore if --inf isn't provided.
+3. minute: Minute of the hour (0–59) when the script should run. Default: 0. Will be ignore if --inf isn't provided.
+4. --inf: Whether to run the script indefinitely until interrupt by the user. Run once by default.
 
 ## Note(s)
 1. This script was design to work with ~~Twitter~~ X's free API. Higher tiers require additional adjustments if you want the bot to send videos.
