@@ -15,7 +15,7 @@ A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favor
    ```bash
    pip install apscheduler
    ```
-5. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Key. (Do not share this with anyone unless you know what you're doing)
+5. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Bearer Token. (Do not share this with anyone unless you know what you're doing)
 6. A [Telegram Bot](https://t.me/BotFather) token. (Ditto)
 7. The handle(username) of your desired ~~Twitter~~ X account.
 8. The ID of the chat you want the bot to send updates to.
