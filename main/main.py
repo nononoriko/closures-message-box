@@ -17,7 +17,8 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "hour",
+    "--hour",
+    "-h",
     type=int,
     nargs="?",
     default=9,
@@ -25,7 +26,8 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    "minute",
+    "--minute",
+    "-m",
     type=int,
     nargs="?",
     default=0,
@@ -34,6 +36,7 @@ parser.add_argument(
 
 parser.add_argument(
     "--inf",
+    "-i",
     action="store_true",
     default=False,
     help="Whether to run the script indefinitely until interrupt by the user. Run once by default."
