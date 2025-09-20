@@ -47,7 +47,7 @@ with open("./main/data.json") as file:
     dataDict = json.load(file)
     missingKeys = [key for key in requiredKeys if key not in dataDict]
     if missingKeys:
-        print(f"Missing {", ".join(missingKeys)} from data.json, cannot continue, exiting.")
+        print(f"Missing {', '.join(missingKeys)} from data.json, cannot continue, exiting.")
         exit(-1)
 
 def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
