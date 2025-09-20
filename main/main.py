@@ -214,7 +214,7 @@ async def run_scheduler(timezone):
     scheduler.start()
 
     try:
-        asyncio.Event().wait()
+        await asyncio.Event().wait()
     except (KeyboardInterrupt, SystemExit):
         scheduler.shutdown()
 
