@@ -197,7 +197,7 @@ async def main(timezone) -> None:
             await TBot.send_message(dataDict["ChatID"], caption)
 
 async def run(timezone):
-    main(timezone)
+    await main(timezone)
 
 async def run_scheduler(timezone):
     scheduler = AsyncIOScheduler(timezone=timezone)
