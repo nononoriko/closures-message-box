@@ -160,5 +160,4 @@ async def job():
     await asyncio.Event().wait()   
 
 if __name__ == "__main__":
-    localTimeZone = datetime.now().astimezone().tzinfo
-    asyncio.run(main(localTimeZone))
+    asyncio.run(job())
