@@ -18,7 +18,7 @@ parser.add_argument(
 
 parser.add_argument(
     "--hour",
-    "-h",
+    "-o",
     type=int,
     nargs="?",
     default=9,
