@@ -15,7 +15,8 @@ A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favor
    ```bash
    pip install apscheduler
    ```
-5. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Key. (Do not share this with anyone unless you know what you're doing)
+   Alternatively, you can use Windows' Task Scheduler instead, though modification to the ```main.py``` file is required.
+5. A [~~Twitter~~ X](https://developer.x.com/en/portal/products) API Bearer Token. (Do not share this with anyone unless you know what you're doing)
 6. A [Telegram Bot](https://t.me/BotFather) token. (Ditto)
 7. The handle(username) of your desired ~~Twitter~~ X account.
 8. The ID of the chat you want the bot to send updates to.
@@ -46,7 +47,7 @@ A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favor
 
 ## Note(s)
 1. This script was design to work with ~~Twitter~~ X's free API. Higher tiers require additional adjustments if you want the bot to send videos.
-2. Running this with a smaller interval is theoretically possible, but be prepared to be rate-limited by Elon Musk unless you're using higher tiers.
+2. Running this with a smaller interval and on different accounts is theoretically possible, but you need to make adjustments to the source and be prepared to be rate-limited by Elon Musk unless you're using higher tiers.
 
 ## License
 This program is licensed under the GNU General Public License 3.0, see [LICENSE](LICENSE) for more details.
