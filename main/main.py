@@ -120,7 +120,6 @@ def extract_tweet_data(tweets, timezone):
 
     return results
 
-
 async def main(timezone):
     TBot = Bot(dataDict["BotToken"])
     client = tweepy.Client(
@@ -130,7 +129,6 @@ async def main(timezone):
 
     tweets = get_recent_tweets(client)
     extracted = extract_tweet_data(tweets, timezone)
-
 
     for tweet in extracted:
         caption = f"""{tweet["text"]}
