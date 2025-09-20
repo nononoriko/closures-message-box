@@ -222,6 +222,10 @@ if __name__ == "__main__":
     localTimeZone = datetime.now().astimezone().tzinfo
 
     if cl_args.inf:
-        asyncio.run(run_scheduler(localTimeZone))
+        loop = asyncio.get_event_loop()
+        try:
+            loop.run_until_complete(run_scheduler(localTimeZone))
+        finally:
+            loop.close()
     else:
         asyncio.run(run(localTimeZone))
