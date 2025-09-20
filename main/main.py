@@ -1,6 +1,7 @@
 from telegram import Bot, InputMediaPhoto
 from datetime import datetime, timezone, timedelta
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from urllib.parse import urlparse
 import json, tweepy, asyncio
 
 requiredKeys = ["XToken", "BotToken", "AccountHandle", "ChatID"]
@@ -24,7 +25,7 @@ def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
         start_time = to_rfc3339(startTime),
         end_time = to_rfc3339(now),
         max_results = 5,
-        tweet_fields = ["created_at"],
+        tweet_fields = ["created_at", "entities"],
         expansions = ["attachments.media_keys"],
         media_fields=["url", "preview_image_url", "type"]
     )
@@ -36,6 +37,13 @@ def to_rfc3339(dt: datetime):
     ms = int(dt.microsecond / 1000)
 
     return dt.strftime(f"%Y-%m-%dT%H:%M:%S.{ms:03d}Z")
+
+def is_url(url: str):
+    try:
+        urlparse(url)
+        return True
+    except:
+        return False
 
 def extract_tweet_data(tweets, timezone):
     results = []
@@ -49,27 +57,45 @@ def extract_tweet_data(tweets, timezone):
         text = tweet.text
         urls_to_replace = []
 
-        if hasattr(tweet, "entities") and tweet.entities:
-            if "urls" in tweet.entities:
-                for url_entity in tweet.entities["urls"]:
-                    tco = url_entity["url"]
-                    expanded = url_entity["expanded_url"]
-                    
-                    if not any(m.url in tco for m in media_lookup.values()):
-                        urls_to_replace.append((tco, expanded))
-        
+        if tweet.entities and "urls" in tweet.entities:
+            for url_entity in tweet.entities["urls"]:
+                tco = url_entity["url"] if isinstance(url_entity, dict) else url_entity.url
+                expanded = url_entity["expanded_url"] if isinstance(url_entity, dict) else url_entity.expanded_url
+
+                is_media_url = any(
+                    getattr(m, "url", None) and m.url in tco
+                    for m in media_lookup.values()
+                )
+                if not is_media_url:
+                    urls_to_replace.append((tco, expanded))
+
         for tco, expanded in urls_to_replace:
             text = text.replace(tco, expanded)
 
-        if hasattr(tweet, "entities") and tweet.entities:
-            if "mentions" in tweet.entities:
-                for mention in tweet.entities["mentions"]:
-                    username = mention["username"]
-                    text = text.replace(f"@{username}", f"https://x.com/{username}")
+        if tweet.entities and "mentions" in tweet.entities:
+            for mention in tweet.entities["mentions"]:
+                username = mention["username"] if isinstance(mention, dict) else mention.username
+                text = text.replace(f"@{username}", f"https://x.com/{username}")
+
+        lines:list[str] = text.strip().splitlines()
+        try:
+            last_line = lines.pop()
+
+            for chars in last_line.split(" "):
+                if(is_url(chars)):
+                    parsed_url = urlparse(chars)
+                    if parsed_url.netloc == "x.com" and ("photo" in parsed_url.path or "video" in parsed_url.path):
+                        last_line = last_line.replace(chars, "")
+            
+            lines.append(last_line)
+        except:
+            ...
+
+        text = "\n".join(lines)
 
         urls = []
         has_video = False
-        if hasattr(tweet, "attachments") and "media_keys" in tweet.attachments:
+        if tweet.attachments and "media_keys" in tweet.attachments:
             for key in tweet.attachments["media_keys"]:
                 if key in media_lookup:
                     media = media_lookup[key]
@@ -88,11 +114,12 @@ def extract_tweet_data(tweets, timezone):
                 "text": text,
                 "media": urls,
                 "has_video": has_video,
-                "created_at": time_str
+                "created_at": time_str,
             }
         )
 
     return results
+
 
 async def main(timezone):
     TBot = Bot(dataDict["BotToken"])
