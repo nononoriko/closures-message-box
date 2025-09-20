@@ -54,7 +54,7 @@ with open("./main/data.json") as file:
         print(f"Missing {', '.join(missingKeys)} from data.json, cannot continue, exiting.")
         exit(-1)
 
-def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
+def get_recent_tweets(client: tweepy.Client) -> tweepy.Response:
     now = datetime.now(timezone.utc)
     startTime = now - timedelta(days=1)
     
@@ -72,6 +72,8 @@ def get_recent_tweets(client: tweepy.Client) -> tweepy.client.Response:
 
     if cl_args.maxResult > 0:
         kwargs["max_results"] = cl_args.maxResult
+    else:
+        kwargs["max_results"] = 100
 
     tweets = client.get_users_tweets(**kwargs)
 
@@ -179,6 +181,13 @@ async def main(timezone) -> None:
     )
 
     tweets = get_recent_tweets(client)
+
+    if tweets.meta['result_count'] == 0:
+        print(f"{dataDict['AccountHandle']} doesn't post anything today.")
+        return
+    
+    print(f"Found {tweets.meta['result_count']} posts from {dataDict['AccountHandle']}.")
+
     extracted = extract_tweet_data(tweets, timezone)
 
     for tweet in extracted:
