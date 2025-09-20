@@ -21,7 +21,7 @@ A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favor
 8. The ID of the chat you want the bot to send updates to.
 
 ## Running
-1. Clone this repository:
+1. Clone this repository (Requires [Git](https://git-scm.com/downloads)):
    ```bash
    git clone https://github.com/uwungu01-rep/closures-message-box
    ```
