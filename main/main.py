@@ -14,7 +14,7 @@ parser.add_argument(
     type=int,
     nargs="?",
     default=0,
-    help="Limit the amount of posts to pull. No limit by default."
+    help="Limit the number of posts to pull. 100 by default."
 )
 
 parser.add_argument(
@@ -23,7 +23,7 @@ parser.add_argument(
     type=int,
     nargs="?",
     default=9,
-    help="Hour of the day (0–23) when the script should run. Default: 9. Will be ignore if --inf isn't provided."
+    help="Hour of the day (0–23) when the script should run. Default: 9. Will be ignored if --inf isn't provided."
 )
 
 parser.add_argument(
@@ -32,7 +32,7 @@ parser.add_argument(
     type=int,
     nargs="?",
     default=0,
-    help="Minute of the hour (0–59) when the script should run. Default: 0. Will be ignore if --inf isn't provided."
+    help="Minute of the hour (0–59) when the script should run. Default: 0. Will be ignored if --inf isn't provided."
 )
 
 parser.add_argument(
@@ -40,7 +40,7 @@ parser.add_argument(
     "-i",
     action="store_true",
     default=False,
-    help="Whether to run the script indefinitely until interrupt by the user. Run once by default."
+    help="Whether to run the script indefinitely until interrupted by the user. Run once by default."
 )
 
 cl_args = parser.parse_args()
