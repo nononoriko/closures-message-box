@@ -1,6 +1,5 @@
 from telegram import Bot, InputMediaPhoto
 from datetime import datetime, timezone, timedelta
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from urllib.parse import urlparse
 import json, tweepy, asyncio, argparse
 
@@ -13,7 +12,7 @@ parser.add_argument(
     "-r",
     type=int,
     nargs="?",
-    default=0,
+    default=100,
     help="Limit the number of posts to pull. 100 by default."
 )
 
@@ -70,10 +69,7 @@ def get_recent_tweets(client: tweepy.Client) -> tweepy.Response:
         "media_fields": ["url", "preview_image_url", "type"]
     }
 
-    if cl_args.maxResult > 0:
-        kwargs["max_results"] = cl_args.maxResult
-    else:
-        kwargs["max_results"] = 100
+    kwargs["max_results"] = clamp(cl_args.maxResult, 5, 100)
 
     tweets = client.get_users_tweets(**kwargs)
 
@@ -212,7 +208,19 @@ async def main(timezone) -> None:
 async def run(timezone):
     await main(timezone)
 
+run_once = False
+try:
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+except ImportError:
+    run_once = True
+    print("apscheduler not found, only run once.")
+except Exception as e:
+    print(f"Error: {e}")
+    exit(-1)
+
 async def run_scheduler(timezone):
+    from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
     scheduler = AsyncIOScheduler(timezone=timezone)
     run_hour = clamp(cl_args.hour, 23)
     run_minute = clamp(cl_args.minute, 59)
@@ -234,11 +242,11 @@ async def run_scheduler(timezone):
 if __name__ == "__main__":
     localTimeZone = datetime.now().astimezone().tzinfo
 
-    if cl_args.inf:
+    if not cl_args.inf or run_once:
+        asyncio.run(run(localTimeZone))
+    else:
         loop = asyncio.get_event_loop()
         try:
             loop.run_until_complete(run_scheduler(localTimeZone))
         finally:
             loop.close()
-    else:
-        asyncio.run(run(localTimeZone))
