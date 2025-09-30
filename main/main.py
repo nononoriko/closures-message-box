@@ -201,9 +201,9 @@ async def main(timezone) -> None:
                 else:
                     mediaGroup.append(InputMediaPhoto(img))
                 
-            await TBot.send_media_group(dataDict["ChatID"], mediaGroup)
+            await TBot.send_media_group(dataDict["ChatID"], mediaGroup, parse_mode=None)
         else:
-            await TBot.send_message(dataDict["ChatID"], caption)
+            await TBot.send_message(dataDict["ChatID"], caption, parse_mode=None)
 
 async def run(timezone):
     await main(timezone)
