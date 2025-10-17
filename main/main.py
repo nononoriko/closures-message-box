@@ -64,9 +64,23 @@ def get_recent_tweets(client: tweepy.Client) -> tweepy.Response:
         "id": userID,
         "start_time": to_rfc3339(startTime),
         "end_time": to_rfc3339(now),
-        "tweet_fields": ["created_at", "entities"],
-        "expansions": ["attachments.media_keys"],
-        "media_fields": ["url", "preview_image_url", "type"]
+        "tweet_fields": [
+            "created_at",
+            "entities",
+            "text",
+            "context_annotations",
+            "referenced_tweets",
+            "attachments"
+        ],
+        "expansions": [
+            "attachments.media_keys",
+            "referenced_tweets.id"
+        ],
+        "media_fields": [
+            "url",
+            "preview_image_url",
+            "type"
+        ]
     }
 
     kwargs["max_results"] = clamp(cl_args.maxResult, 5, 100)
@@ -219,6 +233,9 @@ except Exception as e:
     exit(-1)
 
 async def run_scheduler(timezone):
+    if run_once:
+        return
+
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
     scheduler = AsyncIOScheduler(timezone=timezone)
