@@ -64,23 +64,10 @@ def get_recent_tweets(client: tweepy.Client) -> tweepy.Response:
         "id": userID,
         "start_time": to_rfc3339(startTime),
         "end_time": to_rfc3339(now),
-        "tweet_fields": [
-            "created_at",
-            "entities",
-            "text",
-            "context_annotations",
-            "referenced_tweets",
-            "attachments"
-        ],
-        "expansions": [
-            "attachments.media_keys",
-            "referenced_tweets.id"
-        ],
-        "media_fields": [
-            "url",
-            "preview_image_url",
-            "type"
-        ]
+        "user_fields": ["username"],
+        "tweet_fields": ["created_at", "entities", "text", "note_tweet", "referenced_tweets"],
+        "expansions": ["attachments.media_keys", "referenced_tweets.id", "referenced_tweets.id.author_id"],
+        "media_fields": ["url", "preview_image_url", "type"]
     }
 
     kwargs["max_results"] = clamp(cl_args.maxResult, 5, 100)
@@ -105,27 +92,60 @@ def is_url(url: str) -> bool:
 def extract_tweet_data(tweets, timezone) -> list[dict]:
     results = []
     media_lookup = {}
+    tweet_lookup = {}
+    user_lookup = {}
 
+    # Map included media, tweets, and users
     if "media" in tweets.includes:
         for m in tweets.includes["media"]:
             media_lookup[m.media_key] = m
+    if "tweets" in tweets.includes:
+        for t in tweets.includes["tweets"]:
+            tweet_lookup[t.id] = t
+    if "users" in tweets.includes:
+        for u in tweets.includes["users"]:
+            user_lookup[u.id] = u
 
     for tweet in tweets.data:
-        text = tweet.text
-        urls_to_replace = []
+        # Detect if retweet
+        retweet_link = None
+        # Case 1: Official retweet via referenced_tweets
+        if hasattr(tweet, "referenced_tweets") and tweet.referenced_tweets:
+            for ref in tweet.referenced_tweets:
+                if ref["type"] == "retweeted":
+                    original = tweet_lookup.get(ref["id"])
+                    if original:
+                        author_id = getattr(original, "author_id", None)
+                        if author_id and author_id in user_lookup:
+                            author_name = user_lookup[author_id].username
+                            retweet_link = f"https://x.com/{author_name}/status/{original.id}"
+                        else:
+                            retweet_link = f"https://x.com/i/web/status/{original.id}"
+                    break
 
+        if not retweet_link and hasattr(tweet, "entities") and tweet.entities and "urls" in tweet.entities:
+            for url_entity in tweet.entities["urls"]:
+                expanded = url_entity.get("expanded_url") if isinstance(url_entity, dict) else url_entity.expanded_url
+                if expanded and "x.com" in expanded and "/status/" in expanded:
+                    retweet_link = expanded
+                    break
+
+        if hasattr(tweet, "note_tweet"):
+            text = tweet.note_tweet["text"]
+        else:
+            text = tweet.text
+
+        urls_to_replace = []
         if tweet.entities and "urls" in tweet.entities:
             for url_entity in tweet.entities["urls"]:
                 tco = url_entity["url"] if isinstance(url_entity, dict) else url_entity.url
                 expanded = url_entity["expanded_url"] if isinstance(url_entity, dict) else url_entity.expanded_url
-
                 is_media_url = any(
                     getattr(m, "url", None) and m.url in tco
                     for m in media_lookup.values()
                 )
                 if not is_media_url:
                     urls_to_replace.append((tco, expanded))
-
         for tco, expanded in urls_to_replace:
             text = text.replace(tco, expanded)
 
@@ -134,22 +154,21 @@ def extract_tweet_data(tweets, timezone) -> list[dict]:
                 username = mention["username"] if isinstance(mention, dict) else mention.username
                 text = text.replace(f"@{username}", f"https://x.com/{username}")
 
-        lines:list[str] = text.strip().splitlines()
+        # Clean lines (same as before)
+        lines: list[str] = text.strip().splitlines()
         try:
             last_line = lines.pop()
-
             for chars in last_line.split(" "):
-                if(is_url(chars)):
+                if is_url(chars):
                     parsed_url = urlparse(chars)
                     if parsed_url.netloc == "x.com" and ("photo" in parsed_url.path or "video" in parsed_url.path):
                         last_line = last_line.replace(chars, "")
-            
             lines.append(last_line)
         except:
             ...
-
         text = "\n".join(lines)
 
+        # Media handling
         urls = []
         has_video = False
         if tweet.attachments and "media_keys" in tweet.attachments:
@@ -172,6 +191,7 @@ def extract_tweet_data(tweets, timezone) -> list[dict]:
                 "media": urls,
                 "has_video": has_video,
                 "created_at": time_str,
+                "retweet_link": retweet_link or "None",
             }
         )
 
@@ -205,7 +225,8 @@ async def main(timezone) -> None:
 
 [Timestamp] {tweet["created_at"]}
 [Link] https://x.com/{dataDict["AccountHandle"]}/status/{tweet["id"]}
-[Video] {"Yes" if tweet["has_video"] else "No"}"""
+[Video] {"Yes" if tweet["has_video"] else "No"}
+[Retweet] {tweet["retweet_link"]}"""
         if tweet["media"]:
             mediaGroup = []
 
@@ -235,7 +256,7 @@ except Exception as e:
 async def run_scheduler(timezone):
     if run_once:
         return
-
+    
     from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
     scheduler = AsyncIOScheduler(timezone=timezone)
