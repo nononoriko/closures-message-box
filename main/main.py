@@ -200,11 +200,11 @@ def extract_tweet_data(tweets, timezone) -> list[dict]:
 
     return results
 
-def clamp(number, min, max = None):
-    if max is None:
-        max, min = min, 0
+def clamp(number, min_, max_ = None):
+    if max_ is None:
+        max_, min_ = min_, 0
 
-    return max if number > max else min if number < min else number
+    return max(min(number, max_), min_)
 
 async def main(timezone) -> None:
     TBot = Bot(dataDict["BotToken"])
@@ -215,11 +215,11 @@ async def main(timezone) -> None:
 
     tweets = get_recent_tweets(client)
 
-    if tweets.meta['result_count'] == 0:
-        print(f"{dataDict['AccountHandle']} doesn't post anything today.")
+    if tweets.meta["result_count"] == 0:
+        print(f"{dataDict["AccountHandle"]} doesn't post anything today.")
         return
     
-    print(f"Found {tweets.meta['result_count']} posts from {dataDict['AccountHandle']}.")
+    print(f"Found {tweets.meta["result_count"]} posts from {dataDict["AccountHandle"]}.")
 
     extracted = extract_tweet_data(tweets, timezone)
 
