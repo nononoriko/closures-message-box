@@ -1,7 +1,10 @@
 from telegram import Bot, InputMediaPhoto
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
-import json, tweepy, asyncio, argparse
+import json, tweepy, asyncio, argparse, sys
+
+if sys.platform.startswith("win"):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 parser = argparse.ArgumentParser(
     description="Command line arguments for Closure's Message Box."
