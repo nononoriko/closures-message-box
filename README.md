@@ -26,7 +26,7 @@ A Telegram bot that periodically updates you with ~~Tweets~~ Xs, from your favor
    ```bash
    git clone https://github.com/uwungu01-rep/closures-message-box
    ```
-   Alternatively, download the [zip](https://github.com/uwungu01-rep/closures-message-box/archive/refs/heads/main.zip) file and unzip it at your desired location.
+   Alternatively, download the [zip](https://github.com/nononoriko/closures-message-box/archive/refs/heads/main.zip) file and unzip it at your desired location.
 2. Create a file named data.json in the ```main``` folder. The file should look something like this:
    ```json
    {
